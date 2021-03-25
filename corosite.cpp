@@ -7,6 +7,7 @@ Corosite::Corosite(bool dbg=false){
 void Corosite::start(){
   Wire.begin();
   initializeSdCard();
+  initializeLCD();
 }
 
 // Adding more INA219 Channel to the board
@@ -116,8 +117,7 @@ void Corosite::initializeSdCard(){
   while (!SD.begin(4)) {
     Serial.println("initialization failed!");
   }
-  Serial.println("initialization done.");
-  
+  Serial.println("initialization done."); 
 }
 
 // Write Text file
@@ -133,4 +133,20 @@ void Corosite::writeToFile(String text){
   else{
     Serial.println("[ERROR] Failed writing to file");
   }
+}
+
+void Corosite::initializeLCD(){
+  lcd.begin();
+  lcd.clear();
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("Init..");
+}
+
+void Corosite::showVoltageAndCurrentLCD(float voltage, float current){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print(String(voltage));
+  lcd.setCursor(0,1);
+  lcd.print(String(current));
 }
