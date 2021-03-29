@@ -10,6 +10,8 @@ Corosite cor(true);
 
 void setup() {
   Serial.begin(115200);
+  
+  // By default the initialization will use the largest range (32V, 2A)
   cor.start();
   cor.addChannel(0, 0x40);
 }

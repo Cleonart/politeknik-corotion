@@ -20,15 +20,26 @@ void Corosite::addChannel(int channel, uint8_t address){
   Serial.print("Channel ");
   Serial.print(channel);
   Serial.print(" is ready to use");
-
-  // calibrate sensor
-  calibrateChannel(channel);
 }
 
-// INA219 Calibration
-void Corosite::calibrateChannel(int channel){
+void Corosite::calibrate_16V_400mA(int channel){
   coroDevice[channel].setCalibration_16V_400mA();
-  delay(5000);
+  Serial.println("Sensor is Calibrated");
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Calibrate");
+  lcd.print("16V, 400mA");
+  delay(8000);
+}
+
+void Corosite::calibrate_32V_1A(int channel){
+  coroDevice[channel].setCalibration_32V_1A();
+  Serial.println("Sensor is Calibrated");
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Calibrate");
+  lcd.print("32V, 1A");
+  delay(8000);
 }
 
 // INA219 Get Bus Voltage
