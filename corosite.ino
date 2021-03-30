@@ -3,7 +3,7 @@
 #include "corosite.h"
 
 unsigned long millis_time;
-unsigned long millis_period_1_minute = 60000;
+unsigned long millis_period_1_minute = 1000;
 
 // make the Corosite instancces
 Corosite cor(true);
@@ -34,23 +34,32 @@ void loop() {
     // String data mapping
     String date_  = cor.getDateNow();
     String time_  = cor.getTimeNow();
-    String shunt_ = String(shunt) + "mV";
-    String bus_   = String(bus) + "V";
-    String load_  = String(load) + "V";
+    String load_    = String(load) + "V";
     String current_ = String(current) + "mA";
 
     // Write to file
     String data_to_string = date_ + ",";
     data_to_string += time_ + ",";
-    data_to_string += shunt_ + ",";
-    data_to_string += bus_ + ",";
     data_to_string += load_ + ",";
-    data_to_string += current_; 
+    data_to_string += current_;
+
+    // Corotion
+    String status_code = "NORMAL";
+    if(current >= 100){
+      status_code = "COROTION";
+    }
     cor.writeToFile(data_to_string);
     Serial.println();
     millis_time = millis();
   }
 
-  cor.showVoltageAndCurrentLCD(load, current);
+  if(current >= 100){
+    cor.showCorositeLCD(current);
+  }
+  
+  else{
+    cor.showVoltageAndCurrentLCD(load, current);
+  }
+  
   delay(50);
 }
