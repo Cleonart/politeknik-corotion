@@ -19,13 +19,10 @@ class Corosite{
     // INA219 Instance 
     Adafruit_INA219 coroDevice[4];
     void addChannel(int channel, byte address);
-    void calibrate_16V_400mA(int channel);
-    void calibrate_32V_1A(int channel);
     float getShuntVoltage(int channel);
     float getBusVoltage(int channel);
     float getCurrentMa(int channel);
     float getLoadVoltage(int channel);
-
 
     // RTC
     RTClib myRTC;

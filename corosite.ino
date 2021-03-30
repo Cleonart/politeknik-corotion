@@ -34,18 +34,21 @@ void loop() {
     // String data mapping
     String date_  = cor.getDateNow();
     String time_  = cor.getTimeNow();
-    String shunt_ = String(shunt) + "mV";
-    String bus_   = String(bus) + "V";
     String load_  = String(load) + "V";
     String current_ = String(current) + "mA";
 
     // Write to file
     String data_to_string = date_ + ",";
     data_to_string += time_ + ",";
-    data_to_string += shunt_ + ",";
-    data_to_string += bus_ + ",";
     data_to_string += load_ + ",";
-    data_to_string += current_; 
+    data_to_string += current_ + ",";
+    
+    String status_code = "NORMAL";
+    if(current > 100){
+      status_code = "COROTION";
+    }
+    data_to_string += status_code;
+    
     cor.writeToFile(data_to_string);
     Serial.println();
     millis_time = millis();

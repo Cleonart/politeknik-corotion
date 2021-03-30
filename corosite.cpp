@@ -6,8 +6,8 @@ Corosite::Corosite(bool dbg=false){
 
 void Corosite::start(){
   Wire.begin();
-  initializeSdCard();
   initializeLCD();
+  initializeSdCard();
 }
 
 // Adding more INA219 Channel to the board
@@ -20,26 +20,6 @@ void Corosite::addChannel(int channel, uint8_t address){
   Serial.print("Channel ");
   Serial.print(channel);
   Serial.print(" is ready to use");
-}
-
-void Corosite::calibrate_16V_400mA(int channel){
-  coroDevice[channel].setCalibration_16V_400mA();
-  Serial.println("Sensor is Calibrated");
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("Calibrate");
-  lcd.print("16V, 400mA");
-  delay(8000);
-}
-
-void Corosite::calibrate_32V_1A(int channel){
-  coroDevice[channel].setCalibration_32V_1A();
-  Serial.println("Sensor is Calibrated");
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("Calibrate");
-  lcd.print("32V, 1A");
-  delay(8000);
 }
 
 // INA219 Get Bus Voltage
@@ -133,7 +113,7 @@ void Corosite::initializeSdCard(){
 
 // Write Text file
 void Corosite::writeToFile(String text){
-  fileHandler = SD.open("poli.txt", FILE_WRITE);
+  fileHandler = SD.open("poli.csv", FILE_WRITE);
   if(fileHandler){
     Serial.println("--- WRITING ---");
     Serial.println(text);
