@@ -22,40 +22,6 @@ void Corosite::addChannel(int channel, uint8_t address){
   Serial.print(" is ready to use");
 }
 
-// INA219 Get Bus Voltage
-float Corosite::getShuntVoltage(int channel){
-  if(debug){
-    Serial.print(getDateNow());
-    Serial.print(" - ");
-    Serial.print(getTimeNow());
-    Serial.print(" -- ");
-    Serial.print("Channel ");
-    Serial.print(channel);
-    Serial.print(" Shunt Voltage : ");
-    Serial.print(coroDevice[channel].getShuntVoltage_mV());
-    Serial.print("mV");
-    Serial.println("");
-  }
-  return coroDevice[channel].getShuntVoltage_mV();
-}
-
-// INA219 Get Bus Voltage
-float Corosite::getBusVoltage(int channel){
-  if(debug){
-    Serial.print(getDateNow());
-    Serial.print(" - ");
-    Serial.print(getTimeNow());
-    Serial.print(" -- ");
-    Serial.print("Channel ");
-    Serial.print(channel);
-    Serial.print(" Bus Voltage   : ");
-    Serial.print(coroDevice[channel].getBusVoltage_V());
-    Serial.print("V");
-    Serial.println("");
-  }
-  return coroDevice[channel].getBusVoltage_V();
-}
-
 // INA219 Get Current Miliamp
 float Corosite::getCurrentMa(int channel){
   if(debug){

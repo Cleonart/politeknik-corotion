@@ -19,8 +19,6 @@ class Corosite{
     // INA219 Instance 
     Adafruit_INA219 coroDevice[4];
     void addChannel(int channel, byte address);
-    float getShuntVoltage(int channel);
-    float getBusVoltage(int channel);
     float getCurrentMa(int channel);
     float getLoadVoltage(int channel);
 

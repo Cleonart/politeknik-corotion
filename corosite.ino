@@ -10,10 +10,11 @@ Corosite cor(true);
 
 void setup() {
   Serial.begin(115200);
-  
-  // By default the initialization will use the largest range (32V, 2A)
   cor.start();
   cor.addChannel(0, 0x40);
+  cor.addChannel(1, 0x41);
+  cor.addChannel(2, 0x42);
+  cor.addChannel(3, 0x43);
 }
 
 void loop() {
@@ -23,8 +24,6 @@ void loop() {
    * cor.getShuntVoltage(channel)
    * cor.getShuntVoltage(0)  
    */
-  float shunt   = cor.getShuntVoltage(0);
-  float bus     = cor.getBusVoltage(0);
   float load    = cor.getLoadVoltage(0);
   float current = cor.getCurrentMa(0);
 
@@ -32,9 +31,9 @@ void loop() {
   if(millis() >= (millis_time + millis_period_1_minute)){
     
     // String data mapping
-    String date_  = cor.getDateNow();
-    String time_  = cor.getTimeNow();
-    String load_  = String(load) + "V";
+    String date_    = cor.getDateNow();
+    String time_    = cor.getTimeNow();
+    String load_    = String(load) + "V";
     String current_ = String(current) + "mA";
 
     // Write to file
@@ -53,7 +52,6 @@ void loop() {
     Serial.println();
     millis_time = millis();
   }
-
   cor.showVoltageAndCurrentLCD(load, current);
   delay(50);
 }
