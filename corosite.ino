@@ -3,7 +3,7 @@
 #include "corosite.h"
 
 unsigned long millis_time;
-unsigned long millis_period_1_minute = 60000;
+unsigned long millis_period_1_minute = 1000;
 
 // make the Corosite instancces
 Corosite cor(true);
@@ -31,8 +31,8 @@ void loop() {
   if(millis() >= (millis_time + millis_period_1_minute)){
     
     // String data mapping
-    String date_    = cor.getDateNow();
-    String time_    = cor.getTimeNow();
+    String date_  = cor.getDateNow();
+    String time_  = cor.getTimeNow();
     String load_    = String(load) + "V";
     String current_ = String(current) + "mA";
 
