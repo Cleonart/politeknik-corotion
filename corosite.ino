@@ -10,10 +10,11 @@ Corosite cor(true);
 
 void setup() {
   Serial.begin(115200);
-  
-  // By default the initialization will use the largest range (32V, 2A)
   cor.start();
   cor.addChannel(0, 0x40);
+  cor.addChannel(1, 0x41);
+  cor.addChannel(2, 0x42);
+  cor.addChannel(3, 0x43);
 }
 
 void loop() {
@@ -23,8 +24,6 @@ void loop() {
    * cor.getShuntVoltage(channel)
    * cor.getShuntVoltage(0)  
    */
-  float shunt   = cor.getShuntVoltage(0);
-  float bus     = cor.getBusVoltage(0);
   float load    = cor.getLoadVoltage(0);
   float current = cor.getCurrentMa(0);
 
@@ -41,25 +40,18 @@ void loop() {
     String data_to_string = date_ + ",";
     data_to_string += time_ + ",";
     data_to_string += load_ + ",";
-    data_to_string += current_;
-
-    // Corotion
+    data_to_string += current_ + ",";
+    
     String status_code = "NORMAL";
-    if(current >= 100){
+    if(current > 100){
       status_code = "COROTION";
     }
+    data_to_string += status_code;
+    
     cor.writeToFile(data_to_string);
     Serial.println();
     millis_time = millis();
   }
-
-  if(current >= 100){
-    cor.showCorositeLCD(current);
-  }
-  
-  else{
-    cor.showVoltageAndCurrentLCD(load, current);
-  }
-  
+  cor.showVoltageAndCurrentLCD(load, current);
   delay(50);
 }
