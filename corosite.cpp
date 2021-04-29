@@ -131,6 +131,20 @@ void Corosite::configurationFile(){
   delay(2000);
 }
 
+void Corosite::writeToSd(int i){
+  String csv = csvWrapper(i);
+  configs = SD.open("pch" + String(i + 1) + ".csv", FILE_WRITE);
+  if (configs) {
+    Serial.print("---WRITING---");
+    configs.println(csv);
+    configs.close();
+    Serial.println("--- DONE ---");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("ERROR WRITING");
+  }
+}
+
 String Corosite::csvWrapper(int channel){
     float load    = getLoadVoltage(channel);
     float current = getCurrentMa(channel);
@@ -149,7 +163,7 @@ String Corosite::csvWrapper(int channel){
 
     //Serial.println("CHECK IF ABOVE " + String(configuration_file[channel]));
     String status_code = "NORMAL";
-    if(current > 100){
+    if(current > configuration_file[channel]){
       status_code = "COROTION";
     }
     
