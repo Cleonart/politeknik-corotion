@@ -20,6 +20,7 @@ void Corosite::addChannel(int channel, uint8_t address){
   Serial.print("Channel ");
   Serial.print(channel);
   Serial.print(" is ready to use");
+  Serial.println("");
 }
 
 // INA219 Get Current Miliamp
@@ -74,7 +75,7 @@ String Corosite::getTimeNow(){
 
 // Initialize SD Card
 void Corosite::initializeSdCard(){
-  Serial.print("Initializing SD card...");
+  Serial.println("Initializing SD card...");
   while (!SD.begin(4)) {
     Serial.println("initialization failed!");
     lcd.clear();
@@ -83,31 +84,54 @@ void Corosite::initializeSdCard(){
     lcd.setCursor(0,1);
     lcd.print("NOT FOUND");
   }
+  
+  // Init Complete
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("Initialization");
   lcd.setCursor(0,1);
   lcd.print("Completed");
-  Serial.println("initialization done."); 
+  Serial.println("initialization done.");
 }
 
-// Write Text file
-void Corosite::writeToFile(String text, int channel){
-  fileHandler = SD.open("PCH"+String(channel)+".csv", FILE_WRITE);
-  if(fileHandler){
-    Serial.println("--- WRITING ---");
-    Serial.println(text);
-    fileHandler.println(text);
-    fileHandler.close();
-    Serial.println("--- DONE ---");
+void Corosite::configurationFile(){
+  // Get Configuration File
+  Serial.println("Getting Configuration File...");
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Getting >>>");
+  lcd.setCursor(0,1);
+  lcd.print("Config....");
+  configs = SD.open("config.txt", FILE_READ);
+  while(!configs){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Config");
+    lcd.setCursor(0,1);
+    lcd.print("Failed!");
   }
-  else{
-    Serial.println("[ERROR] Failed writing to file");
-    Serial.println(fileHandler);
+  
+  // read from the file until there's nothing else in it:
+  int i = 0;
+  while (i < 4) {
+    int limit_value = configs.parseInt();
+    configuration_file[i] = limit_value;
+    Serial.println(configuration_file[i]);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Channel [" + String(i + 1) + "]");
+    lcd.setCursor(0,1);
+    lcd.print("Limit : " + String(configuration_file[i]) + "mA");
+    i++;
+    delay(1000);
   }
+  
+  // close the file:
+  configs.close();
+  delay(2000);
 }
 
-void Corosite::writeChannelData(int channel){
+String Corosite::csvWrapper(int channel){
     float load    = getLoadVoltage(channel);
     float current = getCurrentMa(channel);
 
@@ -122,25 +146,25 @@ void Corosite::writeChannelData(int channel){
     data_to_string        += time_ + ",";
     data_to_string        += load_ + ",";
     data_to_string        += current_ + ",";
-    
+
+    //Serial.println("CHECK IF ABOVE " + String(configuration_file[channel]));
     String status_code = "NORMAL";
     if(current > 100){
       status_code = "COROTION";
     }
     
     data_to_string += status_code;
-    Serial.println(data_to_string);
-    writeToFile(data_to_string, channel);
-    Serial.println();
-    delay(500);
+    return data_to_string;
 }
+
 
 void Corosite::initializeLCD(){
   lcd.begin();
   lcd.clear();
   lcd.backlight();
   lcd.setCursor(0,0);
-  lcd.print("Init..");
+  lcd.print("Starting");
+  delay(2000);
 }
 
 void Corosite::showVoltageAndCurrentLCD(int channel, float voltage, float current){

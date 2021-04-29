@@ -29,10 +29,10 @@ class Corosite{
     String getTimeNow();
 
     // SD Card
-    File fileHandler;
+    File configs;
     void initializeSdCard();
-    void writeToFile(String text, int channel);
-    void writeChannelData(int channel);
+    void configurationFile();
+    String csvWrapper(int channel);
 
     // LCD
     LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2); 
