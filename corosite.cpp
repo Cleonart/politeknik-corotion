@@ -7,7 +7,6 @@ Corosite::Corosite(bool dbg=false){
 void Corosite::start(){
   Wire.begin();
   initializeLCD();
-  initializeSdCard();
 }
 
 // Adding more INA219 Channel to the board
@@ -25,6 +24,7 @@ void Corosite::addChannel(int channel, uint8_t address){
 
 // INA219 Get Current Miliamp
 float Corosite::getCurrentMa(int channel){
+  float current = coroDevice[channel].getCurrent_mA();
   if(debug){
     Serial.print(getDateNow());
     Serial.print(" - ");
@@ -33,19 +33,20 @@ float Corosite::getCurrentMa(int channel){
     Serial.print("Channel ");
     Serial.print(channel);
     Serial.print(" Current mA    : ");
-    Serial.print(coroDevice[channel].getCurrent_mA());
+    Serial.print(current);
     Serial.print("mA");
     Serial.println();
   }
 
-  if(coroDevice[channel].getCurrent_mA() > 0){
-    return coroDevice[channel].getCurrent_mA();
+  if(current > 0){
+    return current;
   }
   return 0.0;
 }
 
 // INA219 Get Load Voltage
 float Corosite::getLoadVoltage(int channel){
+  float voltage = coroDevice[channel].getBusVoltage_V() + (coroDevice[channel].getShuntVoltage_mV() / 1000);
   if(debug){
     Serial.print(getDateNow());
     Serial.print(" - ");
@@ -54,11 +55,11 @@ float Corosite::getLoadVoltage(int channel){
     Serial.print("Channel ");
     Serial.print(channel);
     Serial.print(" Load Voltage  : ");
-    Serial.print(coroDevice[channel].getBusVoltage_V() + (coroDevice[channel].getShuntVoltage_mV() / 1000));
+    Serial.print(voltage);
     Serial.print("V");
     Serial.println();
   }
-  return coroDevice[channel].getBusVoltage_V() + (coroDevice[channel].getShuntVoltage_mV() / 1000);
+  return voltage;
 }
 
 String Corosite::getDateNow(){
@@ -77,40 +78,25 @@ String Corosite::getTimeNow(){
 void Corosite::initializeSdCard(){
   Serial.println("Initializing SD card...");
   while (!SD.begin(4)) {
-    Serial.println("initialization failed!");
+    Serial.println("SD404");
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print("[ERROR] - SD404");
-    lcd.setCursor(0,1);
-    lcd.print("NOT FOUND");
+    lcd.print("SD404");
   }
   
-  // Init Complete
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("Initialization");
-  lcd.setCursor(0,1);
-  lcd.print("Completed");
-  Serial.println("initialization done.");
-}
-
-void Corosite::configurationFile(){
   // Get Configuration File
   Serial.println("Getting Configuration File...");
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("Getting >>>");
-  lcd.setCursor(0,1);
-  lcd.print("Config....");
+  lcd.print("Config");
   configs = SD.open("config.txt", FILE_READ);
   while(!configs){
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print("Config");
-    lcd.setCursor(0,1);
-    lcd.print("Failed!");
+    lcd.print("CONF404");
   }
-  
+  delay(2000);
+
   // read from the file until there's nothing else in it:
   int i = 0;
   while (i < 4) {
@@ -129,6 +115,12 @@ void Corosite::configurationFile(){
   // close the file:
   configs.close();
   delay(2000);
+  
+  // Init Complete
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Completed");
+  Serial.println("initialization done.");
 }
 
 void Corosite::writeToSd(int i){
@@ -140,19 +132,18 @@ void Corosite::writeToSd(int i){
     configs.close();
     Serial.println("--- DONE ---");
   } else {
-    // if the file didn't open, print an error:
     Serial.println("ERROR WRITING");
   }
 }
 
 String Corosite::csvWrapper(int channel){
-    float load    = getLoadVoltage(channel);
+  
     float current = getCurrentMa(channel);
 
     // String data mapping
     String date_    = getDateNow();
     String time_    = getTimeNow();
-    String load_    = String(load);
+    String load_    = String(getLoadVoltage(channel));
     String current_ = String(current);
 
     // Write to file
@@ -161,12 +152,10 @@ String Corosite::csvWrapper(int channel){
     data_to_string        += load_ + ",";
     data_to_string        += current_ + ",";
 
-    //Serial.println("CHECK IF ABOVE " + String(configuration_file[channel]));
     String status_code = "NORMAL";
     if(current > configuration_file[channel]){
       status_code = "COROTION";
     }
-    
     data_to_string += status_code;
     return data_to_string;
 }

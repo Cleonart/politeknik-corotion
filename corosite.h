@@ -31,7 +31,6 @@ class Corosite{
     // SD Card
     File configs;
     void initializeSdCard();
-    void configurationFile();
     void writeToSd(int i);
     String csvWrapper(int channel);
 

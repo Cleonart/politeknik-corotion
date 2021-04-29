@@ -2,9 +2,6 @@
 // Real time corosit checker
 #include "corosite.h"
 
-unsigned long millis_time;
-unsigned long millis_period_1_minute = 10000;
-
 // make the Corosite instancces
 Corosite cor(true);
 
@@ -15,15 +12,13 @@ void setup() {
   cor.addChannel(1, 0x41);
   cor.addChannel(2, 0x44);
   cor.addChannel(3, 0x45);
-  cor.configurationFile();
+  cor.initializeSdCard();
 }
 
 void loop(){
   // Show the test for all channel
-  int i = 0;
-  for(i = 0; i < 4; i++){
-    int timer = 0;
-    for(timer; timer < 5; timer++){
+  for(int i = 0; i < 4; i++){
+    for(int timer; timer < 5; timer++){
       cor.showVoltageAndCurrentLCD(i + 1, cor.getLoadVoltage(i), cor.getCurrentMa(i));
       delay(500);
     }
