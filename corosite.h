@@ -13,7 +13,8 @@ class Corosite{
   public : 
     Corosite(bool debug=false);
     void start();
-    
+
+    int configuration_file[4];
     bool debug = false;
 
     // INA219 Instance 
@@ -30,13 +31,13 @@ class Corosite{
     // SD Card
     File fileHandler;
     void initializeSdCard();
-    void writeToFile(String text);
+    void writeToFile(String text, int channel);
+    void writeChannelData(int channel);
 
     // LCD
     LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2); 
     void initializeLCD();
-    void showVoltageAndCurrentLCD(float voltage, float current);
-    void showCorositeLCD(float current);
+    void showVoltageAndCurrentLCD(int channel, float voltage, float current);
 };
 
 #endif

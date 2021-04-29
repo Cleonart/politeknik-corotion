@@ -36,7 +36,11 @@ float Corosite::getCurrentMa(int channel){
     Serial.print("mA");
     Serial.println();
   }
-  return coroDevice[channel].getCurrent_mA();
+
+  if(coroDevice[channel].getCurrent_mA() > 0){
+    return coroDevice[channel].getCurrent_mA();
+  }
+  return 0.0;
 }
 
 // INA219 Get Load Voltage
@@ -88,8 +92,8 @@ void Corosite::initializeSdCard(){
 }
 
 // Write Text file
-void Corosite::writeToFile(String text){
-  fileHandler = SD.open("poli.csv", FILE_WRITE);
+void Corosite::writeToFile(String text, int channel){
+  fileHandler = SD.open("PCH"+String(channel)+".csv", FILE_WRITE);
   if(fileHandler){
     Serial.println("--- WRITING ---");
     Serial.println(text);
@@ -99,7 +103,36 @@ void Corosite::writeToFile(String text){
   }
   else{
     Serial.println("[ERROR] Failed writing to file");
+    Serial.println(fileHandler);
   }
+}
+
+void Corosite::writeChannelData(int channel){
+    float load    = getLoadVoltage(channel);
+    float current = getCurrentMa(channel);
+
+    // String data mapping
+    String date_    = getDateNow();
+    String time_    = getTimeNow();
+    String load_    = String(load);
+    String current_ = String(current);
+
+    // Write to file
+    String data_to_string  = date_ + ",";
+    data_to_string        += time_ + ",";
+    data_to_string        += load_ + ",";
+    data_to_string        += current_ + ",";
+    
+    String status_code = "NORMAL";
+    if(current > 100){
+      status_code = "COROTION";
+    }
+    
+    data_to_string += status_code;
+    Serial.println(data_to_string);
+    writeToFile(data_to_string, channel);
+    Serial.println();
+    delay(500);
 }
 
 void Corosite::initializeLCD(){
@@ -110,18 +143,10 @@ void Corosite::initializeLCD(){
   lcd.print("Init..");
 }
 
-void Corosite::showVoltageAndCurrentLCD(float voltage, float current){
+void Corosite::showVoltageAndCurrentLCD(int channel, float voltage, float current){
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print(String(voltage) + " V");
+  lcd.print("[" + String(channel) + "] - " + String(voltage) + " V");
   lcd.setCursor(0,1);
   lcd.print(String(current) + " mA");
-}
-
-void Corosite::showCorositeLCD(float current){
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("Corotion");
-  lcd.setCursor(0,1);
-  lcd.print(String(current));
 }
